@@ -3,10 +3,6 @@ import * as APP from "../src"
 describe("async", () => {
   let validators, tickAllTheWay
 
-  const asyncify = (fn, delay) => (...args) => new Promise(res => (
-    setTimeout(res, delay, fn(...args))
-  ))
-
   beforeEach(() => {
     validators = [
       [

@@ -30,3 +30,8 @@ global.FakeAsync = cb => {
     clock.restore()
   }
 }
+
+
+global.asyncify = (fn, delay) => (...args) => new Promise(res => (
+  setTimeout(res, delay, fn(...args))
+))
