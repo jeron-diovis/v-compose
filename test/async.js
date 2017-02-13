@@ -46,7 +46,7 @@ describe("async", () => {
       result = validate(1)
       result.then(spy)
       tickAllTheWay(tick)
-      assert.equal(spy.getCall(0).args[0], APP.ERROR_VALID)
+      assert.equal(spy.getCall(0).args[0], APP.ERR_VALID)
     })
   })
 

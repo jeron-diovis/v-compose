@@ -1,9 +1,9 @@
 import * as F from "./lib/func_utils"
 
-export const ERROR_NOT_VALIDATED = undefined;
-export const ERROR_VALID = null;
+export const ERR_NONE = undefined;
+export const ERR_VALID = null;
 
-export const isError = x => x !== ERROR_VALID && x !== ERROR_NOT_VALIDATED;
+export const isError = x => x !== ERR_VALID && x !== ERR_NONE;
 isError.not = x => !isError(x);
 
 // ---
@@ -25,23 +25,19 @@ const createValidation = (validate, validateAll, isValid) => validators => ({
 // ---
 
 const _processResult = (result, msg, ...args) => {
-  if (result === ERROR_NOT_VALIDATED) {
-    return ERROR_NOT_VALIDATED;
-  }
+  switch (result) {
+    case ERR_NONE:
+      return ERR_NONE;
 
-  if (result === true) {
-    return ERROR_VALID; // need exactly null, not undefined. Undefined means that value wasn't validated at all
-  }
+    case true:
+      return ERR_VALID;
 
-  if (result !== false) {
-    throw new Error("Validator must be a predicate function")
-  }
+    case false:
+      return typeof msg === "function" ? msg(...args) : msg;
 
-  if (typeof msg === "function") {
-    return msg(...args);
+    default:
+      throw new Error("Validator must be a predicate function")
   }
-
-  return msg;
 };
 
 // ---
@@ -64,7 +60,7 @@ const getFirstError = F.curry((validators, value, ...args) => {
     }
   }
 
-  return ERROR_NOT_VALIDATED
+  return ERR_NONE
 });
 
 const getAllErrors = F.curry((validator, value) => (
@@ -100,7 +96,7 @@ const getFirstErrorAsync = F.curry(async (validators, value, ...args) => {
     }
   }
 
-  return ERROR_NOT_VALIDATED
+  return ERR_NONE
 });
 
 const getAllErrorsAsync = F.curry((validators, value) => (

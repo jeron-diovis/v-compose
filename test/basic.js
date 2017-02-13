@@ -5,11 +5,11 @@ describe("basics", () => {
     assert.isFunction(APP.isError, "isError")
     assert.isFunction(APP.isError.not, "isError.not")
 
-    assert.property(APP, "ERROR_NOT_VALIDATED")
-    assert.isUndefined(APP.ERROR_NOT_VALIDATED)
+    assert.property(APP, "ERR_NONE")
+    assert.isUndefined(APP.ERR_NONE)
 
-    assert.property(APP, "ERROR_VALID")
-    assert.isNull(APP.ERROR_VALID)
+    assert.property(APP, "ERR_VALID")
+    assert.isNull(APP.ERR_VALID)
 
     assert.isFunction(APP.validate, "validate")
     assert.isFunction(APP.validate.all, "validate.all")
@@ -78,7 +78,7 @@ describe("basics", () => {
   })
 
 
-  it("should require validator to return only true, false or ERROR_NOT_VALIDATED", () => {
+  it("should require validator to return only true, false or ERR_NONE", () => {
     const validate = APP.validate([
       [
         x => {
@@ -86,14 +86,14 @@ describe("basics", () => {
             return {}
           }
 
-          return APP.ERROR_NOT_VALIDATED
+          return APP.ERR_NONE
         }
       ]
     ])
 
     assert.equal(
       validate(1),
-      APP.ERROR_NOT_VALIDATED
+      APP.ERR_NONE
     )
 
     assert.throws(

@@ -31,7 +31,7 @@ describe("sync", () => {
 
     assert.equal(
       validate(1),
-      APP.ERROR_VALID
+      APP.ERR_VALID
     )
   })
 
