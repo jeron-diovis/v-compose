@@ -13,6 +13,11 @@ describe("async", () => {
       [
         asyncify(x => x !== -2),
         "is -2"
+      ],
+
+      [
+        asyncify(x => x !== 2),
+        "is 2"
       ]
     ]
 
@@ -37,10 +42,10 @@ describe("async", () => {
 
     FakeAsync(tick => {
       spy = sinon.spy()
-      result = validate(-2)
+      result = validate(2)
       result.then(spy)
-      tick()
-      assert.equal(spy.getCall(0).args[0], "not positive")
+      tickAllTheWay(tick)
+      assert.equal(spy.getCall(0).args[0], "is 2")
 
       spy = sinon.spy()
       result = validate(1)

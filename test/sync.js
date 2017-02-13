@@ -13,6 +13,11 @@ describe("sync", () => {
       [
         x => x !== -2,
         "is -2"
+      ],
+
+      [
+        x => x !== 2,
+        "is 2"
       ]
     ]
   })
@@ -25,8 +30,8 @@ describe("sync", () => {
     const validate = APP.validate(validators)
 
     assert.equal(
-      validate(-2),
-      "not positive"
+      validate(2),
+      "is 2"
     )
 
     assert.equal(
