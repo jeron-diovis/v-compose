@@ -37,13 +37,15 @@ const _processResult = (result, msg, ...args) => {
 
     default:
       if (result && typeof result.then === "function") {
-        console.warn(`
+        console.warn(`[simple-validation]
           Your validator seems to return a Promise. 
           You should pass it to 'validate.async' helper instead of just 'validate'.
         `);
       }
 
-      throw new Error("Validator must be a predicate function")
+      throw new Error(`[simple-validation]
+        Validator must return only true, false, or ERR_NONE 
+      `)
   }
 };
 
@@ -146,12 +148,12 @@ const createSchemeValidator = validateScheme => function(scheme, data) {
 
   ret.fields = function(props, data) {
     if (!Array.isArray(props)) {
-      throw new Error("'props' must be an Array")
+      throw new Error("[simple-validation :: scheme.fields] 'props' must be an Array")
     }
 
     const unexistingKeys = F.difference(props, Object.keys(scheme))
     if (unexistingKeys.length > 0) {
-      throw new Error(`
+      throw new Error(`[simple-validation :: scheme.fields]
         Following keys are not defined in scheme:
         ${unexistingKeys.join(", ")}
       `)
@@ -172,7 +174,9 @@ const createSchemeValidator = validateScheme => function(scheme, data) {
     const validate = scheme[prop]
 
     if (validate === undefined) {
-      throw new Error(`Key '${prop}' is not defined is scheme`)
+      throw new Error(`[simple-validation :: scheme.field]
+        Key '${prop}' is not defined is scheme
+      `)
     }
 
     if (arguments.length === 1) {

@@ -98,7 +98,7 @@ describe("basics", () => {
 
     assert.throws(
       () => validate(-2),
-      /Validator must be a predicate function/
+      /Validator must return only true, false/
     )
   })
 })
