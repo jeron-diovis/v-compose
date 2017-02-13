@@ -2,8 +2,15 @@ import * as APP from "../src"
 
 describe("scheme", () => {
 
-  it("sync", () => {
-    const validate = APP.scheme({
+  let data, validateSync, validateAsync;
+
+  beforeEach(() => {
+    data = {
+      x: -1,
+      y: 1,
+    }
+
+    validateSync = APP.scheme({
       x: APP.validate([
         [
           x => x > 0,
@@ -19,22 +26,8 @@ describe("scheme", () => {
       ]),
     })
 
-    const data = {
-      x: -1,
-      y: 1,
-    }
 
-    const result = validate(data)
-
-    assert.deepEqual(result, {
-      x: "x-error",
-      y: "y-error",
-    })
-  })
-
-
-  it("async", async () => {
-    const validate = APP.scheme.async({
+    validateAsync = APP.scheme.async({
       x: APP.validate.async([
         [
           asyncify(x => x > 0),
@@ -49,51 +42,98 @@ describe("scheme", () => {
         ]
       ]),
     })
+  })
 
-    const data = {
-      x: -1,
-      y: 1,
-    }
+  afterEach(() => {
+    data = null
+    validateSync = null
+    validateAsync = null
+  })
 
-    const result = await validate(data)
+  // ---
 
-    assert.deepEqual(result, {
-      x: "x-error",
-      y: "y-error",
-    })
+  it("sync", () => {
+    assert.deepEqual(
+      validateSync(data),
+      {
+        x: "x-error",
+        y: "y-error",
+      }
+    )
   })
 
 
-  it("subset", () => {
-    const validate = APP.scheme({
-      x: APP.validate([
-        [
-          x => x > 0,
-          "x-error"
-        ]
-      ]),
+  it("async", async () => {
+    assert.deepEqual(
+      await validateAsync(data),
+      {
+        x: "x-error",
+        y: "y-error",
+      }
+    )
+  })
 
-      y: APP.validate([
-        [
-          x => x < 0,
-          "y-error"
-        ]
-      ]),
+
+  describe("subset", () => {
+
+    describe("sync", () => {
+      it("fields", () => {
+        assert.isFunction(validateSync.fields)
+
+        const validateX = validateSync.fields(["x"])
+        const result = validateX(data)
+
+        assert.deepEqual(result, {
+          x: "x-error",
+        })
+      })
+
+      it("single field", () => {
+        assert.isFunction(validateSync.field)
+
+        const validateX = validateSync.field("x")
+        const result = validateX(-1)
+
+        assert.deepEqual(result, "x-error")
+      })
     })
 
-    assert.isFunction(validate.only)
+    describe("async", () => {
+      it("fields", async () => {
+        assert.isFunction(validateAsync.fields)
 
-    const validateX = validate.only([ "x" ])
+        const validateX = validateAsync.fields(["x"])
+        const result = await validateX(data)
 
-    const data = {
-      x: -1,
-      y: 1,
-    }
+        assert.deepEqual(result, {
+          x: "x-error",
+        })
+      })
 
-    const result = validateX(data)
+      it("single field", async () => {
+        assert.isFunction(validateAsync.field)
 
-    assert.deepEqual(result, {
-      x: "x-error",
+        const validateX = validateAsync.field("x")
+        const result = await validateX(-1)
+
+        assert.deepEqual(result, "x-error")
+      })
+    })
+
+    it("should require only keys defined in scheme", () => {
+      assert.throws(
+        () => validateSync.field("unexisting"),
+        Error,
+        /not defined is scheme/,
+        "single field"
+      )
+
+      assert.throws(
+        () => validateSync.fields([ "unexisting" ]),
+        Error,
+        /not defined in scheme/,
+        "multiple fields"
+      )
     })
   })
 })

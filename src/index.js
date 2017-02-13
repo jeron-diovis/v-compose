@@ -134,13 +134,57 @@ validateScheme.async = async (scheme, data) => {
 }
 
 const createSchemeValidator = validateScheme => function(scheme, data) {
-  if (arguments.length === 1) {
-    const ret = data => validateScheme(scheme, data)
-    ret.only = F.curry((props, data) => validateScheme(F.pick(scheme, props), data))
-    return ret
+  if (arguments.length > 1) {
+    return validateScheme(scheme, data)
   }
 
-  return validateScheme(scheme, data)
+  // ---
+
+  const ret = data => validateScheme(scheme, data)
+
+  // ---
+
+  ret.fields = function(props, data) {
+    if (!Array.isArray(props)) {
+      throw new Error("'props' must be an Array")
+    }
+
+    const unexistingKeys = F.difference(props, Object.keys(scheme))
+    if (unexistingKeys.length > 0) {
+      throw new Error(`
+        Following keys are not defined in scheme:
+        ${unexistingKeys.join(", ")}
+      `)
+    }
+
+    const subScheme = F.pick(scheme, props)
+
+    if (arguments.length === 1) {
+      return data => validateScheme(subScheme, data)
+    }
+
+    return validateScheme(subScheme, data)
+  }
+
+  // ---
+
+  ret.field = function(prop, value) {
+    const validate = scheme[prop]
+
+    if (validate === undefined) {
+      throw new Error(`Key '${prop}' is not defined is scheme`)
+    }
+
+    if (arguments.length === 1) {
+      return validate
+    }
+
+    return validate(value)
+  }
+
+  // ---
+
+  return ret
 }
 
 export const scheme = createSchemeValidator(validateScheme)
