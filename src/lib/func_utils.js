@@ -1,2 +1,3 @@
-export { default as curry } from "lodash/curry"
-export { default as negate } from "lodash/negate"
+export { default as curry } from "lodash.curry"
+export { default as zipObject } from "lodash.zipobject"
+export { default as pick } from "lodash.pick"
