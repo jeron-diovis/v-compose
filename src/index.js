@@ -4,7 +4,7 @@ export const ERROR_NOT_VALIDATED = undefined;
 export const ERROR_VALID = null;
 
 export const isError = x => x !== ERROR_VALID && x !== ERROR_NOT_VALIDATED;
-isError.not = F.negate(isError);
+isError.not = x => !isError(x);
 
 // ---
 
@@ -111,3 +111,30 @@ validate.async = paired(getFirstErrorAsync, getAllErrorsAsync)
 isValid.async = F.curry(async (validators, value) => !isError(await validate.async(validators, value)))
 
 validation.async = createValidation(validate.async, validate.async.all, isValid.async);
+
+// ---
+
+const validateScheme = (scheme, data) => {
+  const keys = Object.keys(scheme)
+  const values = keys.map(k => scheme[k](data[k], data))
+  return F.zipObject(keys, values)
+}
+
+validateScheme.async = async (scheme, data) => {
+  const keys = Object.keys(scheme)
+  const values = await Promise.all(keys.map(k => scheme[k](data[k], data)))
+  return F.zipObject(keys, values)
+}
+
+const createSchemeValidator = validateScheme => function(scheme, data) {
+  if (arguments.length === 1) {
+    const ret = data => validateScheme(scheme, data)
+    ret.only = F.curry((props, data) => validateScheme(F.pick(scheme, props), data))
+    return ret
+  }
+
+  return validateScheme(scheme, data)
+}
+
+export const scheme = createSchemeValidator(validateScheme)
+scheme.async = createSchemeValidator(validateScheme.async)

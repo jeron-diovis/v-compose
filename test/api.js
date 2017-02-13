@@ -20,6 +20,9 @@ describe("basics", () => {
     assert.isFunction(APP.validate.async.all, "validate.async.all")
     assert.isFunction(APP.isValid.async, "isValid.async")
     assert.isFunction(APP.validation.async, "validation.async")
+
+    assert.isFunction(APP.scheme, "scheme")
+    assert.isFunction(APP.scheme.async, "scheme.async")
   })
 
 
