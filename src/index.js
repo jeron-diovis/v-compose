@@ -135,6 +135,40 @@ validateScheme.async = async (scheme, data) => {
   return F.zipObject(keys, values)
 }
 
+
+const schemeFieldsValidator = (validateScheme, scheme) => function(props, data) {
+  if (!Array.isArray(props)) {
+    throw new Error("[simple-validation :: scheme.fields] 'props' must be an Array")
+  }
+
+  const unexistingKeys = F.difference(props, Object.keys(scheme))
+  if (unexistingKeys.length > 0) {
+    throw new Error(`[simple-validation :: scheme.fields]
+      Following keys are not defined in scheme:
+      ${unexistingKeys.join(", ")}
+    `)
+  }
+
+  const subScheme = F.pick(scheme, props)
+
+  return arguments.length === 1
+    ? data => validateScheme(subScheme, data)
+    : validateScheme(subScheme, data)
+}
+
+
+const schemeSingleFieldValidator = scheme => function(prop, value) {
+  if (!scheme.hasOwnProperty(prop)) {
+    throw new Error(`[simple-validation :: scheme.field]
+      Key '${prop}' is not defined is scheme
+    `)
+  }
+
+  const validate = scheme[prop]
+  return arguments.length === 1 ? validate : validate(value)
+}
+
+
 const createSchemeValidator = validateScheme => function(scheme, data) {
   if (arguments.length > 1) {
     return validateScheme(scheme, data)
@@ -143,51 +177,8 @@ const createSchemeValidator = validateScheme => function(scheme, data) {
   // ---
 
   const ret = data => validateScheme(scheme, data)
-
-  // ---
-
-  ret.fields = function(props, data) {
-    if (!Array.isArray(props)) {
-      throw new Error("[simple-validation :: scheme.fields] 'props' must be an Array")
-    }
-
-    const unexistingKeys = F.difference(props, Object.keys(scheme))
-    if (unexistingKeys.length > 0) {
-      throw new Error(`[simple-validation :: scheme.fields]
-        Following keys are not defined in scheme:
-        ${unexistingKeys.join(", ")}
-      `)
-    }
-
-    const subScheme = F.pick(scheme, props)
-
-    if (arguments.length === 1) {
-      return data => validateScheme(subScheme, data)
-    }
-
-    return validateScheme(subScheme, data)
-  }
-
-  // ---
-
-  ret.field = function(prop, value) {
-    const validate = scheme[prop]
-
-    if (validate === undefined) {
-      throw new Error(`[simple-validation :: scheme.field]
-        Key '${prop}' is not defined is scheme
-      `)
-    }
-
-    if (arguments.length === 1) {
-      return validate
-    }
-
-    return validate(value)
-  }
-
-  // ---
-
+  ret.fields = schemeFieldsValidator(validateScheme, scheme)
+  ret.field = schemeSingleFieldValidator(scheme)
   return ret
 }
 
