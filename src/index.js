@@ -69,7 +69,7 @@ const getFirstError = F.curry((validators, value, ...args) => {
     }
   }
 
-  return ERR_NONE
+  return ERR_VALID
 });
 
 const getAllErrors = F.curry((validator, value) => (
@@ -105,7 +105,7 @@ const getFirstErrorAsync = F.curry(async (validators, value, ...args) => {
     }
   }
 
-  return ERR_NONE
+  return ERR_VALID
 });
 
 const getAllErrorsAsync = F.curry((validators, value) => (
