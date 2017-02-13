@@ -124,9 +124,9 @@ describe("scheme", () => {
       })
 
       it("single field", () => {
-        assert.isFunction(validateSync.field)
+        assert.isFunction(validateSync.just)
 
-        const validateX = validateSync.field("x")
+        const validateX = validateSync.just("x")
         const result = validateX(-1, "extra arg")
 
         assert.deepEqual(result, "x-error")
@@ -165,9 +165,9 @@ describe("scheme", () => {
       })
 
       it("single field", async () => {
-        assert.isFunction(validateAsync.field)
+        assert.isFunction(validateAsync.just)
 
-        const validateX = validateAsync.field("x")
+        const validateX = validateAsync.just("x")
         const result = await validateX(-1, "extra arg")
 
         assert.deepEqual(result, "x-error")
@@ -185,7 +185,7 @@ describe("scheme", () => {
 
     it("should require only keys defined in scheme", () => {
       assert.throws(
-        () => validateSync.field("unexisting"),
+        () => validateSync.just("unexisting"),
         Error,
         /not defined is scheme/,
         "single field"

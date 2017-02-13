@@ -178,7 +178,7 @@ const createSchemeValidator = validateScheme => function(scheme, ...args) {
 
   const ret = (...args) => validateScheme(scheme, ...args)
   ret.fields = schemeFieldsValidator(validateScheme, scheme)
-  ret.field = schemeSingleFieldValidator(scheme)
+  ret.just = schemeSingleFieldValidator(scheme)
   return ret
 }
 
