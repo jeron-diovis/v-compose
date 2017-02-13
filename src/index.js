@@ -123,20 +123,20 @@ validation.async = createValidation(validate.async, validate.async.all, isValid.
 
 // ---
 
-const validateScheme = (scheme, data) => {
+const validateScheme = (scheme, data, ...args) => {
   const keys = Object.keys(scheme)
-  const values = keys.map(k => scheme[k](data[k], data))
+  const values = keys.map(k => scheme[k](data[k], data, ...args))
   return F.zipObject(keys, values)
 }
 
-validateScheme.async = async (scheme, data) => {
+validateScheme.async = async (scheme, data, ...args) => {
   const keys = Object.keys(scheme)
-  const values = await Promise.all(keys.map(k => scheme[k](data[k], data)))
+  const values = await Promise.all(keys.map(k => scheme[k](data[k], data, ...args)))
   return F.zipObject(keys, values)
 }
 
 
-const schemeFieldsValidator = (validateScheme, scheme) => function(props, data) {
+const schemeFieldsValidator = (validateScheme, scheme) => function(props, ...args) {
   if (!Array.isArray(props)) {
     throw new Error("[simple-validation :: scheme.fields] 'props' must be an Array")
   }
@@ -152,12 +152,12 @@ const schemeFieldsValidator = (validateScheme, scheme) => function(props, data) 
   const subScheme = F.pick(scheme, props)
 
   return arguments.length === 1
-    ? data => validateScheme(subScheme, data)
-    : validateScheme(subScheme, data)
+    ? (...args) => validateScheme(subScheme, ...args)
+    : validateScheme(subScheme, ...args)
 }
 
 
-const schemeSingleFieldValidator = scheme => function(prop, value) {
+const schemeSingleFieldValidator = scheme => function(prop, ...args) {
   if (!scheme.hasOwnProperty(prop)) {
     throw new Error(`[simple-validation :: scheme.field]
       Key '${prop}' is not defined is scheme
@@ -165,18 +165,18 @@ const schemeSingleFieldValidator = scheme => function(prop, value) {
   }
 
   const validate = scheme[prop]
-  return arguments.length === 1 ? validate : validate(value)
+  return arguments.length === 1 ? validate : validate(...args)
 }
 
 
-const createSchemeValidator = validateScheme => function(scheme, data) {
+const createSchemeValidator = validateScheme => function(scheme, ...args) {
   if (arguments.length > 1) {
-    return validateScheme(scheme, data)
+    return validateScheme(scheme, ...args)
   }
 
   // ---
 
-  const ret = data => validateScheme(scheme, data)
+  const ret = (...args) => validateScheme(scheme, ...args)
   ret.fields = schemeFieldsValidator(validateScheme, scheme)
   ret.field = schemeSingleFieldValidator(scheme)
   return ret
