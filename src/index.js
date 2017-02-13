@@ -33,6 +33,10 @@ const _processResult = (result, msg, ...args) => {
     return ERROR_VALID; // need exactly null, not undefined. Undefined means that value wasn't validated at all
   }
 
+  if (result !== false) {
+    throw new Error("Validator must be a predicate function")
+  }
+
   if (typeof msg === "function") {
     return msg(...args);
   }

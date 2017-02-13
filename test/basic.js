@@ -76,4 +76,29 @@ describe("basics", () => {
       ]
     )
   })
+
+
+  it("should require validator to return only true, false or ERROR_NOT_VALIDATED", () => {
+    const validate = APP.validate([
+      [
+        x => {
+          if (x < 0) {
+            return {}
+          }
+
+          return APP.ERROR_NOT_VALIDATED
+        }
+      ]
+    ])
+
+    assert.equal(
+      validate(1),
+      APP.ERROR_NOT_VALIDATED
+    )
+
+    assert.throws(
+      () => validate(-2),
+      /Validator must be a predicate function/
+    )
+  })
 })

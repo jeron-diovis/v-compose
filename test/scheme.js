@@ -42,9 +42,7 @@ describe("scheme", () => {
         ]
       ]),
 
-      // even if `validate.async` is not used,
-      // it still works normally
-      y: APP.validate([
+      y: APP.validate.async([
         [
           asyncify(x => x < 0),
           "y-error"
