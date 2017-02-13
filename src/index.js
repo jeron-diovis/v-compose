@@ -36,6 +36,13 @@ const _processResult = (result, msg, ...args) => {
       return typeof msg === "function" ? msg(...args) : msg;
 
     default:
+      if (result && typeof result.then === "function") {
+        console.warn(`
+          Your validator seems to return a Promise. 
+          You should pass it to 'validate.async' helper instead of just 'validate'.
+        `);
+      }
+
       throw new Error("Validator must be a predicate function")
   }
 };
