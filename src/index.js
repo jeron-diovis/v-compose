@@ -142,7 +142,7 @@ validation.async = createValidation(validate.async, validate.async.all, isValid.
 
 // ---
 
-const processSchemeValidatorResult = result => {
+const processSyncSchemeValidatorResult = result => {
   if (result && typeof result.then === "function") {
     console.warn(`[simple-validation :: scheme]
       One of validators in your scheme seems to return a Promise. 
@@ -163,7 +163,7 @@ const validateScheme = (scheme, data, ...args) => {
     const validator = scheme[k]
     const field = data[k]
     const result = validator(field, data, ...args)
-    return processSchemeValidatorResult(result)
+    return processSyncSchemeValidatorResult(result)
   })
   return F.zipObject(keys, values)
 }
@@ -196,14 +196,14 @@ const schemeFieldsValidator = (validateScheme, scheme, omitMode = false) => func
   const subScheme = take(scheme, props)
 
   return arguments.length === 1
-    ? (...args) => validateScheme(subScheme, ...args)
+    ? validateScheme.bind(null, subScheme)
     : validateScheme(subScheme, ...args)
 }
 
 
 const schemeSingleFieldValidator = scheme => function(prop, ...args) {
   if (!scheme.hasOwnProperty(prop)) {
-    throw new Error(`[simple-validation :: scheme.field]
+    throw new Error(`[simple-validation :: scheme.just]
       Key '${prop}' is not defined is scheme
     `)
   }
@@ -220,7 +220,7 @@ const createSchemeValidator = validateScheme => function(scheme, ...args) {
 
   // ---
 
-  const ret = (...args) => validateScheme(scheme, ...args)
+  const ret = validateScheme.bind(null, scheme)
   ret.fields = schemeFieldsValidator(validateScheme, scheme, false)
   ret.fields.omit = schemeFieldsValidator(validateScheme, scheme, true)
   ret.just = schemeSingleFieldValidator(scheme)
