@@ -63,9 +63,9 @@ const validateValue = F.curry(
 
 const getFirstError = F.curry((validators, value, ...args) => {
   for (const validator of validators) {
-    const error = validateValue(validator, value, ...args)
-    if (isError(error)) {
-      return error
+    const result = validateValue(validator, value, ...args)
+    if (isError(result)) {
+      return result
     }
   }
 
@@ -73,7 +73,7 @@ const getFirstError = F.curry((validators, value, ...args) => {
 });
 
 const getAllErrors = F.curry((validator, value, ...args) => (
-  validator.map(params => validateValue(params, value, ...args)).filter(isError)
+  validator.map(cfg => validateValue(cfg, value, ...args)).filter(isError)
 ));
 
 export const validate = paired(getFirstError, getAllErrors);
@@ -99,20 +99,20 @@ validateValue.async = F.curry(
 
 const getFirstErrorAsync = F.curry(async (validators, value, ...args) => {
   for (const validator of validators) {
-    const error = await validateValue.async(validator, value, ...args)
-    if (isError(error)) {
-      return error
+    const result = await validateValue.async(validator, value, ...args)
+    if (isError(result)) {
+      return result
     }
   }
 
   return ERR_VALID
 });
 
-const getAllErrorsAsync = F.curry((validators, value, ...args) => (
-  Promise.all(
-    validators.map(validator => validateValue.async(validator, value, ...args))
-  )
-  .then(xs => xs.filter(isError))
+const getAllErrorsAsync = F.curry(async (validators, value, ...args) => (
+  (await Promise.all(
+    validators.map(cfg => validateValue.async(cfg, value, ...args))
+  ))
+  .filter(isError)
 ));
 
 validate.async = paired(getFirstErrorAsync, getAllErrorsAsync)
@@ -125,13 +125,21 @@ validation.async = createValidation(validate.async, validate.async.all, isValid.
 
 const validateScheme = (scheme, data, ...args) => {
   const keys = Object.keys(scheme)
-  const values = keys.map(k => scheme[k](data[k], data, ...args))
+  const values = keys.map(k => {
+    const validator = scheme[k]
+    const field = data[k]
+    return validator(field, data, ...args)
+  })
   return F.zipObject(keys, values)
 }
 
 validateScheme.async = async (scheme, data, ...args) => {
   const keys = Object.keys(scheme)
-  const values = await Promise.all(keys.map(k => scheme[k](data[k], data, ...args)))
+  const values = await Promise.all(keys.map(k => {
+    const validator = scheme[k]
+    const field = data[k]
+    return validator(field, data, ...args)
+  }))
   return F.zipObject(keys, values)
 }
 
