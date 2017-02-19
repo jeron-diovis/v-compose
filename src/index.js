@@ -179,7 +179,7 @@ validateScheme.async = async (scheme, data, ...args) => {
 }
 
 
-const schemeFieldsValidator = (validateScheme, scheme) => function(props, ...args) {
+const schemeFieldsValidator = (validateScheme, scheme, omitMode = false) => function(props, ...args) {
   if (!Array.isArray(props)) {
     throw new Error("[simple-validation :: scheme.fields] 'props' must be an Array")
   }
@@ -192,7 +192,8 @@ const schemeFieldsValidator = (validateScheme, scheme) => function(props, ...arg
     `)
   }
 
-  const subScheme = F.pick(scheme, props)
+  const take = omitMode ? F.omit : F.pick
+  const subScheme = take(scheme, props)
 
   return arguments.length === 1
     ? (...args) => validateScheme(subScheme, ...args)
@@ -220,7 +221,8 @@ const createSchemeValidator = validateScheme => function(scheme, ...args) {
   // ---
 
   const ret = (...args) => validateScheme(scheme, ...args)
-  ret.fields = schemeFieldsValidator(validateScheme, scheme)
+  ret.fields = schemeFieldsValidator(validateScheme, scheme, false)
+  ret.fields.omit = schemeFieldsValidator(validateScheme, scheme, true)
   ret.just = schemeSingleFieldValidator(scheme)
   return ret
 }

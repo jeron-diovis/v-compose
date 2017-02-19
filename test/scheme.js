@@ -102,25 +102,48 @@ describe("scheme", () => {
   describe("subset", () => {
 
     describe("sync", () => {
-      it("fields", () => {
-        assert.isFunction(validateSync.fields)
+      describe("fields", () => {
+        it("pick", () => {
+          assert.isFunction(validateSync.fields)
 
-        const validateX = validateSync.fields(["x"])
-        const result = validateX(DATA, "extra arg")
+          const validateX = validateSync.fields(["x"])
+          const result = validateX(DATA, "extra arg")
 
-        assert.deepEqual(result, {
-          x: "x-error",
+          assert.deepEqual(result, {
+            x: "x-error",
+          })
+
+          assert.deepEqual(
+            validatorX.getCall(0).args,
+            [
+              DATA.x, // field value
+              undefined, // validator params
+              DATA, // entire state being validated
+              "extra arg", // extra args passed to validator
+            ]
+          )
         })
 
-        assert.deepEqual(
-          validatorX.getCall(0).args,
-          [
-            DATA.x, // field value
-            undefined, // validator params
-            DATA, // entire state being validated
-            "extra arg", // extra args passed to validator
-          ]
-        )
+        it("omit", () => {
+          assert.isFunction(validateSync.fields)
+
+          const validateY = validateSync.fields.omit(["x"])
+          const result = validateY(DATA, "extra arg")
+
+          assert.deepEqual(result, {
+            y: "y-error",
+          })
+
+          assert.deepEqual(
+            validatorY.getCall(0).args,
+            [
+              DATA.y, // field value
+              undefined, // validator params
+              DATA, // entire state being validated
+              "extra arg", // extra args passed to validator
+            ]
+          )
+        })
       })
 
       it("single field", () => {
@@ -143,25 +166,48 @@ describe("scheme", () => {
     })
 
     describe("async", () => {
-      it("fields", async () => {
-        assert.isFunction(validateAsync.fields)
+      describe("fields", () => {
+        it("pick", async () => {
+          assert.isFunction(validateAsync.fields)
 
-        const validateX = validateAsync.fields(["x"])
-        const result = await validateX(DATA, "extra arg")
+          const validateX = validateAsync.fields(["x"])
+          const result = await validateX(DATA, "extra arg")
 
-        assert.deepEqual(result, {
-          x: "x-error",
+          assert.deepEqual(result, {
+            x: "x-error",
+          })
+
+          assert.deepEqual(
+            validatorX.getCall(0).args,
+            [
+              DATA.x, // field value
+              undefined, // validator params
+              DATA, // entire state being validated
+              "extra arg", // extra args passed to validator
+            ]
+          )
         })
 
-        assert.deepEqual(
-          validatorX.getCall(0).args,
-          [
-            DATA.x, // field value
-            undefined, // validator params
-            DATA, // entire state being validated
-            "extra arg", // extra args passed to validator
-          ]
-        )
+        it("omit", async () => {
+          assert.isFunction(validateAsync.fields)
+
+          const validateY = validateAsync.fields.omit(["x"])
+          const result = await validateY(DATA, "extra arg")
+
+          assert.deepEqual(result, {
+            y: "y-error",
+          })
+
+          assert.deepEqual(
+            validatorY.getCall(0).args,
+            [
+              DATA.y, // field value
+              undefined, // validator params
+              DATA, // entire state being validated
+              "extra arg", // extra args passed to validator
+            ]
+          )
+        })
       })
 
       it("single field", async () => {
