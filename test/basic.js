@@ -123,4 +123,20 @@ describe("basics", () => {
       /Validator must return only true, false/
     )
   })
+
+  it("should warn when sync validator returns a Promise", () => {
+    const warn = sinon.stub(console, "warn")
+
+    const validate = APP.validate([
+      [ x => Promise.resolve(APP.ERR_VALID) ]
+    ])
+
+    try { validate(1) } catch (e) {}
+    assert.match(
+      warn.getCall(0).args[0],
+      /Your validator seems to return a Promise/
+    )
+
+    warn.restore()
+  })
 })
