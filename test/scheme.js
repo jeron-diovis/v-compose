@@ -199,4 +199,37 @@ describe("scheme", () => {
       )
     })
   })
+
+  it("should warn and throw if there is async validator in sync scheme", () => {
+    const warn = sinon.stub(console, "warn")
+
+    const validate = APP.scheme({
+      x: APP.validate.async([
+        [
+          validatorX,
+          "x-error"
+        ]
+      ])
+    })
+
+    // ---
+
+    assert.throws(
+      () => validate({ x: 1 }),
+      /Validators in sync scheme must not return a Promise/
+    )
+
+    // ---
+
+    try { validate({ x: 1 }) } catch (e) {}
+
+    assert.match(
+      warn.getCall(0).args[0],
+      /One of validators in your scheme seems to return a Promise/
+    )
+
+    // ---
+
+    warn.restore()
+  })
 })

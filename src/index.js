@@ -24,7 +24,7 @@ const createValidation = (validate, validateAll, isValid) => validators => ({
 
 // ---
 
-const _processResult = (result, msg, ...args) => {
+const processSingleValidatorResult = (result, msg, ...args) => {
   switch (result) {
     case ERR_NONE:
       return ERR_NONE;
@@ -39,7 +39,7 @@ const _processResult = (result, msg, ...args) => {
       if (result && typeof result.then === "function") {
         console.warn(`[simple-validation]
           Your validator seems to return a Promise. 
-          You should pass it to 'validate.async' helper instead of just 'validate'.
+          Use 'validate.async' helper instead of 'validate'.
         `);
       }
 
@@ -57,7 +57,7 @@ const validateValue = F.curry(
     value, ...args
   ) => {
     const isValid = validator(value, params, ...args);
-    return _processResult(isValid, msg, value, params, ...args);
+    return processSingleValidatorResult(isValid, msg, value, params, ...args);
   }
 );
 
@@ -92,7 +92,7 @@ validateValue.async = F.curry(
     value, ...args
   ) => {
     const isValid = await validator(value, params, ...args);
-    return _processResult(isValid, msg, value, params, ...args);
+    return processSingleValidatorResult(isValid, msg, value, params, ...args);
   }
 );
 
@@ -123,12 +123,28 @@ validation.async = createValidation(validate.async, validate.async.all, isValid.
 
 // ---
 
+const processSchemeValidatorResult = result => {
+  if (result && typeof result.then === "function") {
+    console.warn(`[simple-validation :: scheme]
+      One of validators in your scheme seems to return a Promise. 
+      Use 'scheme.async' helper instead of 'scheme'.
+    `);
+
+    throw new Error(`[simple-validation :: scheme]
+      Validators in sync scheme must not return a Promise 
+    `)
+  }
+
+  return result
+};
+
 const validateScheme = (scheme, data, ...args) => {
   const keys = Object.keys(scheme)
   const values = keys.map(k => {
     const validator = scheme[k]
     const field = data[k]
-    return validator(field, data, ...args)
+    const result = validator(field, data, ...args)
+    return processSchemeValidatorResult(result)
   })
   return F.zipObject(keys, values)
 }
