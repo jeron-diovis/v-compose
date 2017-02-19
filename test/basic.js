@@ -5,6 +5,9 @@ describe("basics", () => {
     assert.isFunction(APP.isError, "isError")
     assert.isFunction(APP.isError.not, "isError.not")
 
+    assert.isFunction(APP.hasErrors, "hasErrors")
+    assert.isFunction(APP.hasErrors.not, "hasErrors.not")
+
     assert.property(APP, "ERR_NONE")
     assert.isUndefined(APP.ERR_NONE)
 
@@ -25,6 +28,32 @@ describe("basics", () => {
     assert.isFunction(APP.scheme.async, "scheme.async")
   })
 
+  it("isError", () => {
+    assert.isFalse(APP.isError(APP.ERR_VALID), "ERR_VALID")
+    assert.isFalse(APP.isError(APP.ERR_NONE), "ERR_NONE")
+    assert.isTrue(APP.isError("whatever"), "anything else")
+    assert.isFalse(APP.isError.not("whatever"), "invert anything else")
+  })
+
+  it("hasErrors", () => {
+    assert.isFalse(APP.hasErrors({
+      x: APP.ERR_VALID,
+      y: APP.ERR_NONE,
+    }), "valid scheme")
+
+    assert.isTrue(APP.hasErrors({
+      x: APP.ERR_VALID,
+      y: "whatever",
+    }), "invalid scheme")
+
+    assert.isTrue(APP.hasErrors({
+      x: [ APP.ERR_NONE, "whatever" ],
+    }), "scheme with array")
+
+    assert.isFalse(APP.hasErrors.not({
+      x: [ APP.ERR_NONE, "whatever" ],
+    }), "invert scheme with array")
+  })
 
   describe("validator arguments", () => {
 
