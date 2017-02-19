@@ -72,8 +72,8 @@ const getFirstError = F.curry((validators, value, ...args) => {
   return ERR_VALID
 });
 
-const getAllErrors = F.curry((validator, value) => (
-  validator.map(params => validateValue(params, value)).filter(isError)
+const getAllErrors = F.curry((validator, value, ...args) => (
+  validator.map(params => validateValue(params, value, ...args)).filter(isError)
 ));
 
 export const validate = paired(getFirstError, getAllErrors);
@@ -108,9 +108,9 @@ const getFirstErrorAsync = F.curry(async (validators, value, ...args) => {
   return ERR_VALID
 });
 
-const getAllErrorsAsync = F.curry((validators, value) => (
+const getAllErrorsAsync = F.curry((validators, value, ...args) => (
   Promise.all(
-    validators.map(validator => validateValue.async(validator, value))
+    validators.map(validator => validateValue.async(validator, value, ...args))
   )
   .then(xs => xs.filter(isError))
 ));

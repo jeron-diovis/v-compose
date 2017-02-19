@@ -26,29 +26,51 @@ describe("basics", () => {
   })
 
 
-  it("validator arguments", () => {
-    const validator = sinon.spy()
+  describe("validator arguments", () => {
 
-    const validate = APP.validate([
-      [
-        validator,
-        "error message",
-        "some validator parameter",
-        "unused validator parameter",
+    let validator, cfg
+
+    beforeEach(() => {
+      validator = sinon.spy()
+
+      cfg = [
+        [
+          validator,
+          "error message",
+          "some validator parameter",
+          "unused validator parameter",
+        ]
       ]
-    ])
+    })
 
-    validate(-2, "validator_extra_arg_1", "validator_extra_arg_2")
+    afterEach(() => {
+      validator = null
+      cfg = null
+    })
 
-    assert.deepEqual(
-      validator.getCall(0).args,
-      [
-        -2,
-        "some validator parameter",
-        "validator_extra_arg_1",
-        "validator_extra_arg_2",
-      ]
-    )
+    const test = create => {
+      const validate = create(cfg)
+
+      validate(-2, "validator_extra_arg_1", "validator_extra_arg_2")
+
+      assert.deepEqual(
+        validator.getCall(0).args,
+        [
+          -2,
+          "some validator parameter",
+          "validator_extra_arg_1",
+          "validator_extra_arg_2",
+        ]
+      )
+    }
+
+    it("single", () => {
+      test(APP.validate)
+    })
+
+    it("all", () => {
+      test(APP.validate.all)
+    })
   })
 
 
