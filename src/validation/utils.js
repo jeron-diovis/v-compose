@@ -1,7 +1,7 @@
 import * as F from "../lib/func_utils"
 import { ERR_NONE, ERR_VALID } from "../constants"
 
-export const mapValidators = F.curry((fn, validators, transform) => {
+const mapValidators = F.curry((fn, validators, transform) => {
   const newValidators = transform(validators)
   const ret = (...args) => fn(newValidators, ...args)
   ret.map = mapValidators(fn, newValidators)
