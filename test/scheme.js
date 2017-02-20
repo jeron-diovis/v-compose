@@ -1,4 +1,5 @@
 import * as APP from "../src"
+import * as F from "../src/lib/func_utils"
 
 describe("scheme", () => {
 
@@ -277,5 +278,26 @@ describe("scheme", () => {
     // ---
 
     warn.restore()
+  })
+
+  it("map", () => {
+    const validate = validateSync
+      .map(scheme => F.omit(scheme, [ "x" ]))
+      .map(scheme => Object.assign(scheme, {
+        y: scheme.y.map(validators => [
+          [
+            x => x !== 1,
+            "y is 1"
+          ],
+          ...validators,
+        ])
+      }))
+
+    assert.deepEqual(
+      validate(DATA, "extra arg"),
+      { y: "y is 1" }
+    )
+
+    assert.isFalse(validatorX.called)
   })
 })

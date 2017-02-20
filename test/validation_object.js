@@ -1,10 +1,11 @@
 import * as APP from "../src"
 
-describe("sync", () => {
-  let validators
+describe("validation object", () => {
+
+  let Validation
 
   beforeEach(() => {
-    validators = [
+    Validation = APP.validation([
       [
         x => x > 0,
         "not positive"
@@ -19,16 +20,31 @@ describe("sync", () => {
         x => x !== 2,
         "is 2"
       ]
-    ]
+    ])
   })
 
   afterEach(() => {
-    validators = null
+    Validation = null
+  })
+
+  it("api", () => {
+    assert.isObject(Validation)
+
+
+    assert.isFunction(Validation.first)
+    assert.isFunction(Validation.all)
+    assert.isFunction(Validation.isValid)
+
+    assert.isFunction(Validation.first.map)
+    assert.isFunction(Validation.all.map)
+    assert.isFunction(Validation.isValid.map)
+
+    assert.isFunction(Validation.map)
   })
 
   describe("get first error", () => {
     it("run", () => {
-      const validate = APP.validate(validators)
+      const validate = Validation.first
 
       assert.equal(
         validate(2),
@@ -42,14 +58,13 @@ describe("sync", () => {
     })
 
     it("map", () => {
-      const validate = APP.validate(validators)
-        .map(xs => [
-          [
-            x => x !== -3,
-            "is -3"
-          ],
-          ...xs
-        ])
+      const validate = Validation.first.map(xs => [
+        [
+          x => x !== -3,
+          "is -3"
+        ],
+        ...xs
+      ])
 
       assert.equal(
         validate(-3),
@@ -65,7 +80,7 @@ describe("sync", () => {
 
   describe("get all errors", () => {
     it("run", () => {
-      const validate = APP.validateAll(validators)
+      const validate = Validation.all
 
       assert.deepEqual(
         validate(-2),
@@ -82,14 +97,13 @@ describe("sync", () => {
     })
 
     it("map", () => {
-      const validate = APP.validateAll(validators)
-        .map(xs => [
-          ...xs,
-          [
-            x => x !== -3,
-            "is -3"
-          ]
-        ])
+      const validate = Validation.all.map(xs => [
+        ...xs,
+        [
+          x => x !== -3,
+          "is -3"
+        ]
+      ])
 
       assert.deepEqual(
         validate(-3),
@@ -105,24 +119,42 @@ describe("sync", () => {
 
   describe("isValid", () => {
     it("run", () => {
-      const isValid = APP.isValid(validators)
+      const isValid = Validation.isValid
 
       assert.isFalse(isValid(-2))
       assert.isTrue(isValid(1))
     })
 
     it("map", () => {
-      const isValid = APP.isValid(validators)
-        .map(xs => [
-          ...xs,
-          [
-            x => x !== 3,
-            "is 3"
-          ]
-        ])
+      const isValid = Validation.isValid.map(xs => [
+        ...xs,
+        [
+          x => x !== 3,
+          "is 3"
+        ]
+      ])
 
       assert.isFalse(isValid(3))
       assert.isTrue(isValid.map(xs => xs.slice(0, -1))(3))
     })
+  })
+
+  it("map", () => {
+    const validation = Validation
+      .map(xs => [ xs[0] ])
+      .map(xs => [
+        ...xs,
+        [
+          x => x !== -1,
+          "is -1"
+        ]
+      ])
+
+    assert.equal(validation.first(-1), "not positive")
+    assert.deepEqual(validation.all(-1), [
+      "not positive",
+      "is -1"
+    ])
+    assert.isFalse(validation.isValid(-1))
   })
 })

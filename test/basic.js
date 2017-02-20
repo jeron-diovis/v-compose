@@ -15,12 +15,12 @@ describe("basics", () => {
     assert.isNull(APP.ERR_VALID)
 
     assert.isFunction(APP.validate, "validate")
-    assert.isFunction(APP.validate.all, "validate.all")
+    assert.isFunction(APP.validateAll, "validateAll")
     assert.isFunction(APP.isValid, "isValid")
     assert.isFunction(APP.validation, "validation")
 
     assert.isFunction(APP.validate.async, "validate.async")
-    assert.isFunction(APP.validate.async.all, "validate.async.all")
+    assert.isFunction(APP.validateAll.async, "validateAll.async")
     assert.isFunction(APP.isValid.async, "isValid.async")
     assert.isFunction(APP.validation.async, "validation.async")
 
@@ -98,7 +98,7 @@ describe("basics", () => {
     })
 
     it("all", () => {
-      test(APP.validate.all)
+      test(APP.validateAll)
     })
   })
 

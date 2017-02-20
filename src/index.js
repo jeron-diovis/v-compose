@@ -27,18 +27,28 @@ hasErrors.not = x => !hasErrors(x);
 
 // ---
 
-const paired = (single, all) => {
-  const fn = single;
-  fn.all = all;
-  return fn;
-};
+const mapValidators = F.curry((fn, validators, transform) => {
+  const newValidators = transform(validators)
+  const ret = (...args) => fn(newValidators, ...args)
+  ret.map = mapValidators(fn, newValidators)
+  return ret
+})
 
-const createValidation = (validate, validateAll, isValid) => validators => ({
-  validate: paired(
-    validate(validators),
-    validateAll(validators)
-  ),
+const mappable = fn => function(validators, ...args) {
+  if (arguments.length > 1) {
+    return fn(validators, ...args)
+  }
+
+  const ret = fn.bind(null, validators)
+  ret.map = mapValidators(fn, validators)
+  return ret
+}
+
+const createValidation = (validateFirst, validateAll, isValid) => validators => ({
+  first: validateFirst(validators),
+  all: validateAll(validators),
   isValid: isValid(validators),
+  map: map => createValidation(validateFirst, validateAll, isValid)(map(validators)),
 })
 
 // ---
@@ -63,7 +73,7 @@ const processSingleValidatorResult = (result, msg, ...args) => {
       }
 
       throw new Error(`[simple-validation]
-        Validator must return only true, false, or ERR_NONE 
+        Validator must return only true, false, or ERR_NONE
       `)
   }
 };
@@ -95,11 +105,13 @@ const getAllErrors = F.curry((validator, value, ...args) => (
   validator.map(cfg => validateValue(cfg, value, ...args)).filter(isError)
 ));
 
-export const validate = paired(getFirstError, getAllErrors);
+const hasNoErrors = F.curry((validators, value) => !isError(getFirstError(validators, value)))
 
-export const isValid = F.curry((validators, value) => !isError(validate(validators, value)));
+export const validate = mappable(getFirstError);
+export const validateAll = mappable(getAllErrors);
+export const isValid = mappable(hasNoErrors);
 
-export const validation = createValidation(validate, validate.all, isValid);
+export const validation = createValidation(validate, validateAll, isValid);
 
 
 // ---
@@ -134,11 +146,14 @@ const getAllErrorsAsync = F.curry(async (validators, value, ...args) => (
   .filter(isError)
 ));
 
-validate.async = paired(getFirstErrorAsync, getAllErrorsAsync)
+const hasNoErrorsAsync = F.curry(async (validators, value) => !isError(await getFirstErrorAsync(validators, value)))
 
-isValid.async = F.curry(async (validators, value) => !isError(await validate.async(validators, value)))
+validate.async = mappable(getFirstErrorAsync)
+validateAll.async = mappable(getAllErrorsAsync)
+isValid.async = mappable(hasNoErrorsAsync)
 
-validation.async = createValidation(validate.async, validate.async.all, isValid.async);
+validation.async = createValidation(validate.async, validateAll.async, isValid.async);
+
 
 // ---
 
@@ -224,6 +239,7 @@ const createSchemeValidator = validateScheme => function(scheme, ...args) {
   ret.fields = schemeFieldsValidator(validateScheme, scheme, false)
   ret.fields.omit = schemeFieldsValidator(validateScheme, scheme, true)
   ret.just = schemeSingleFieldValidator(scheme)
+  ret.map = transform => createSchemeValidator(validateScheme)(transform(scheme))
   return ret
 }
 
