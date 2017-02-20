@@ -1,4 +1,4 @@
-import * as APP from "../src"
+import validation, * as APP from "../src"
 
 describe("basics", () => {
   it("api", () => {
@@ -18,6 +18,9 @@ describe("basics", () => {
     assert.isFunction(APP.validateAll, "validateAll")
     assert.isFunction(APP.isValid, "isValid")
     assert.isFunction(APP.validation, "validation")
+
+    assert.isFunction(validation, "default export")
+    assert.equal(validation, APP.validation, "default export eq .validation")
 
     assert.isFunction(APP.validate.async, "validate.async")
     assert.isFunction(APP.validateAll.async, "validateAll.async")
