@@ -56,6 +56,15 @@ describe("async", () => {
         "not positive"
       )
     })
+
+    it("if no validators returned explicit status, result must be ERR_NONE", async () => {
+      const validate = APP.validate.async([])
+
+      assert.strictEqual(
+        await validate(undefined),
+        APP.ERR_NONE
+      )
+    })
   })
 
   describe("get all errors", () => {

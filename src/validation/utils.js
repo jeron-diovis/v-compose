@@ -25,6 +25,10 @@ export const createValidation = (validateFirst, validateAll, isValid) => validat
   map: map => createValidation(validateFirst, validateAll, isValid)(map(validators)),
 })
 
+const DEFAULT_ERROR_MSG = `
+  [simple-validator] Undefined error message.
+  Use explicit empty string, if you want to not display any text. 
+`
 
 export const processValidatorResult = (result, msg, ...args) => {
   switch (result) {
@@ -35,7 +39,15 @@ export const processValidatorResult = (result, msg, ...args) => {
       return ERR_VALID;
 
     case false:
-      return typeof msg === "function" ? msg(...args) : msg;
+      if (typeof msg === "function") {
+        msg = msg(...args)
+      }
+
+      if (msg == null) {
+        msg = DEFAULT_ERROR_MSG
+      }
+
+      return msg
 
     default:
       if (result && typeof result.then === "function") {

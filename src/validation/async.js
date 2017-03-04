@@ -1,6 +1,6 @@
 import * as F from "../lib/func_utils"
 import { isError } from "../helpers";
-import { ERR_VALID } from "../constants";
+import { ERR_NONE } from "../constants";
 import { processValidatorResult } from "./utils"
 
 // ---
@@ -18,14 +18,16 @@ const validateValue = F.curry(
 // ---
 
 export const getFirstError = F.curry(async (validators, value, ...args) => {
+  let result = ERR_NONE
+
   for (const validator of validators) {
-    const result = await validateValue(validator, value, ...args)
+    result = await validateValue(validator, value, ...args)
     if (isError(result)) {
       return result
     }
   }
 
-  return ERR_VALID
+  return result
 });
 
 export const getAllErrors = F.curry(async (validators, value, ...args) => (
