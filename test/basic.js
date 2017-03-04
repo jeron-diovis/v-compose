@@ -1,6 +1,6 @@
 import validation, * as APP from "../src"
 
-describe("basics", () => {
+describe("basics:", () => {
   it("api", () => {
     assert.isFunction(APP.isError, "isError")
     assert.isFunction(APP.isError.not, "isError.not")
@@ -132,28 +132,61 @@ describe("basics", () => {
   })
 
 
-  it("should require validator to return only true, false or ERR_NONE", () => {
-    const validate = APP.validate([
-      [
-        x => {
-          if (x < 0) {
-            return {}
+  describe("should require validator to return only true, false or ERR_NONE:", () => {
+    let config
+
+    beforeEach(() => {
+      config = [
+        [
+          x => {
+            if (x < 0) {
+              return {}
+            }
+
+            return APP.ERR_NONE
           }
-
-          return APP.ERR_NONE
-        }
+        ]
       ]
-    ])
+    })
 
-    assert.equal(
-      validate(1),
-      APP.ERR_NONE
-    )
+    afterEach(() => {
+      config = null
+    })
 
-    assert.throws(
-      () => validate(-2),
-      /Validator must return only true, false/
-    )
+    it("sync", () => {
+      const validate = APP.validate(config)
+
+      assert.equal(
+        validate(1),
+        APP.ERR_NONE,
+        "valid value"
+      )
+
+      assert.throws(
+        () => validate(-2),
+        Error,
+        /Validator must return only true, false/,
+        "invalid value"
+      )
+    })
+
+    it("async", async () => {
+      const validate = APP.validate.async(config)
+
+      assert.equal(
+        await validate(1),
+        APP.ERR_NONE,
+        "valid value"
+      )
+
+      // not sure this is correct way to test async exceptions
+      const onError = sinon.spy()
+      await validate(-2).catch(onError)
+      assert.match(
+        onError.getCall(0).args[0].message,
+        /Validator must return only true, false/
+      )
+    })
   })
 
   it("should warn when sync validator returns a Promise", () => {
