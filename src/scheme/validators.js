@@ -8,7 +8,7 @@ const processSyncSchemeValidatorResult = result => {
     console.warn(`[simple-validation :: scheme]
       One of validators in your scheme seems to return a Promise. 
       Use 'scheme.async' helper instead of 'scheme'.
-    `);
+    `)
 
     throw new Error(`[simple-validation :: scheme]
       Validators in sync scheme must not return a Promise 

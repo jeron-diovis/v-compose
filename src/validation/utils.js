@@ -33,10 +33,10 @@ const DEFAULT_ERROR_MSG = `
 export const processValidatorResult = (result, msg, ...args) => {
   switch (result) {
     case ERR_NONE:
-      return ERR_NONE;
+      return ERR_NONE
 
     case true:
-      return ERR_VALID;
+      return ERR_VALID
 
     case false:
       if (typeof msg === "function") {
@@ -54,7 +54,7 @@ export const processValidatorResult = (result, msg, ...args) => {
         console.warn(`[simple-validation]
           Your validator seems to return a Promise. 
           Use 'validate.async' helper instead of 'validate'.
-        `);
+        `)
       }
 
       throw new Error(`[simple-validation]

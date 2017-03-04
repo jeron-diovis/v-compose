@@ -2,9 +2,9 @@ import { ERR_NONE, ERR_VALID } from "./constants"
 
 // ---
 
-export const isError = x => x !== ERR_VALID && x !== ERR_NONE;
+export const isError = x => x !== ERR_VALID && x !== ERR_NONE
 
-isError.not = x => !isError(x);
+isError.not = x => !isError(x)
 
 // ---
 
@@ -24,4 +24,4 @@ export const hasErrors = obj => {
   return false
 }
 
-hasErrors.not = x => !hasErrors(x);
+hasErrors.not = x => !hasErrors(x)
