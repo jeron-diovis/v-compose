@@ -247,7 +247,7 @@ describe("basics:", () => {
     })
   })
 
-  describe("should allow object with named keys as validator config", () => {
+  describe("should allow object with named keys instead of validators list", () => {
     it("sync", () => {
       const validator = x => x > 0 ? null : "error"
       const validate = APP.validate({ validator })
@@ -261,6 +261,36 @@ describe("basics:", () => {
     it("async", async () => {
       const validator = x => x > 0 ? null : "error"
       const validate = APP.validate.async({ validator })
+
+      assert.equal(
+        await validate(-1),
+        "error"
+      )
+    })
+  })
+
+  describe("should allow object { fn, msg, params } as particular validator config", () => {
+    it("sync", () => {
+      const validate = APP.validate([
+        {
+          fn: x => x > 0,
+          msg: "error"
+        }
+      ])
+
+      assert.equal(
+        validate(-1),
+        "error"
+      )
+    })
+
+    it("async", async () => {
+      const validate = APP.validate.async([
+        {
+          fn: x => x > 0,
+          msg: "error"
+        }
+      ])
 
       assert.equal(
         await validate(-1),
@@ -286,5 +316,43 @@ describe("basics:", () => {
         "is -1"
       ]
     )
+  })
+
+  describe("`.map` should always receive validator config in object form", () => {
+    let fn, msg, params, spy
+
+    beforeEach(() => {
+      fn = x => x > 0
+      msg = "error"
+      params = {}
+      spy = sinon.spy()
+    })
+
+    afterEach(() => {
+      fn = null
+      msg = null
+      params = null
+      spy = null
+    })
+
+    const test = (fn, label) => () => {
+      fn([
+        [ fn, msg, params ]
+      ])
+      .map(spy)
+
+      const validatorsList = spy.getCall(0).args[0]
+      const validatorConfig = validatorsList[0]
+
+      assert.equal(validatorConfig.constructor, Object, `${label}: config is not an object`)
+      assert.equal(validatorConfig.fn, fn, `${label}: fn is wrong`)
+      assert.equal(validatorConfig.msg, msg, `${label}: msg is wrong`)
+      assert.equal(validatorConfig.params, params, `${label}: params is wrong`)
+    }
+
+    it(".validate", test(APP.validate, ".validate"))
+    it(".validateAll", test(APP.validateAll, ".validateAll"))
+    it(".isValid", test(APP.isValid, ".isValid"))
+    it(".validation", test(APP.validation, ".validation"))
   })
 })

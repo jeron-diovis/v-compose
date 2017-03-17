@@ -1,8 +1,23 @@
 import * as F from "../lib/func_utils"
 import { ERR_NONE, ERR_VALID } from "../constants"
 
+
+const ensureObjectValidators = F.map(x => {
+  if (typeof x === "function") {
+    return { fn: x, msg: undefined, params: undefined }
+  }
+
+  if (Array.isArray(x)) {
+    const [ fn, msg, params ] = x
+    return { fn, msg, params }
+  }
+
+  return x
+})
+
+
 const mapValidators = F.curry((fn, validators, transform) => {
-  const newValidators = transform(validators)
+  const newValidators = transform(ensureObjectValidators(validators))
   const ret = fn.bind(null, newValidators)
   ret.map = mapValidators(fn, newValidators)
   return ret
@@ -22,7 +37,9 @@ export const createValidation = (validateFirst, validateAll, isValid) => validat
   first: validateFirst(validators),
   all: validateAll(validators),
   isValid: isValid(validators),
-  map: map => createValidation(validateFirst, validateAll, isValid)(map(validators)),
+  map: transform => createValidation(validateFirst, validateAll, isValid)(
+    transform(ensureObjectValidators(validators))
+  ),
 })
 
 const DEFAULT_ERROR_MSG = `

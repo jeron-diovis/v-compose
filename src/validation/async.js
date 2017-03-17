@@ -7,15 +7,22 @@ import { processValidatorResult } from "./utils"
 
 const validateValue = F.curry(
   async (cfg, value, ...args) => {
-    if (typeof cfg !== "function") {
-      const [ validator, msg, params ] = cfg
-      const isValid = await validator(value, params, ...args)
-      return processValidatorResult(isValid, msg, value, params, ...args)
-    } else {
+    if (typeof cfg === "function") {
       const result = await cfg(value, ...args)
       const isValid = !isError(result)
       return processValidatorResult(isValid, result, value, ...args)
     }
+
+    let fn, msg, params
+
+    if (Array.isArray(cfg)) {
+      ([ fn, msg, params ] = cfg)
+    } else {
+      ({ fn, msg, params } = cfg)
+    }
+
+    const isValid = await fn(value, params, ...args)
+    return processValidatorResult(isValid, msg, value, params, ...args)
   }
 )
 
