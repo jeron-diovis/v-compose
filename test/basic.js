@@ -204,4 +204,45 @@ describe("basics:", () => {
 
     warn.restore()
   })
+
+  describe("should allow to pass a function instead of validator config", () => {
+    it("sync", () => {
+      const validator = x => x > 0 ? null : "error"
+      const validate = APP.validate([ validator ])
+
+      assert.equal(
+        validate(-1),
+        "error"
+      )
+    })
+
+    it("async", async () => {
+      const validator = x => x > 0 ? null : "error"
+      const validate = APP.validate.async([ validator ])
+
+      assert.equal(
+        await validate(-1),
+        "error"
+      )
+    })
+  })
+
+  it("composition", () => {
+    const V1 = APP.validate([
+      [ x => x > 0, "not positive" ]
+    ])
+
+    const V2 = APP.validateAll([
+      V1,
+      [ x => x !== -1, "is -1" ],
+    ])
+
+    assert.deepEqual(
+      V2(-1),
+      [
+        "not positive",
+        "is -1"
+      ]
+    )
+  })
 })

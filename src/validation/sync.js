@@ -6,12 +6,16 @@ import { processValidatorResult } from "./utils"
 // ---
 
 const validateValue = F.curry(
-  (
-    [ validator, msg, params ],
-    value, ...args
-  ) => {
-    const isValid = validator(value, params, ...args)
-    return processValidatorResult(isValid, msg, value, params, ...args)
+  (cfg, value, ...args) => {
+    if (typeof cfg !== "function") {
+      const [ validator, msg, params ] = cfg
+      const isValid = validator(value, params, ...args)
+      return processValidatorResult(isValid, msg, value, params, ...args)
+    } else {
+      const result = cfg(value, ...args)
+      const isValid = !isError(result)
+      return processValidatorResult(isValid, result, value, ...args)
+    }
   }
 )
 
