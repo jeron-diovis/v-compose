@@ -1,6 +1,7 @@
 {
   "presets": ["es2015"],
   "plugins": [
+    "closure-elimination",
     "transform-async-to-generator",
     ["transform-runtime", {
       "helpers": false,
