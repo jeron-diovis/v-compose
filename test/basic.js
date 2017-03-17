@@ -205,6 +205,26 @@ describe("basics:", () => {
     warn.restore()
   })
 
+  it("if no validators returned explicit status, result must be ERR_NONE", () => {
+    const validate = APP.validate([])
+
+    assert.strictEqual(
+      validate(undefined),
+      APP.ERR_NONE
+    )
+  })
+
+  it("if error msg is empty, should return default msg", () => {
+    const validate = APP.validate([
+      [ x => x > 0 ]
+    ])
+
+    assert.match(
+      validate(undefined),
+      /Undefined error message/
+    )
+  })
+
   describe("should allow to pass a function instead of validator config", () => {
     it("sync", () => {
       const validator = x => x > 0 ? null : "error"
