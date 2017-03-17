@@ -1,11 +1,19 @@
 {
-  "name": "package-boilerplate",
+  "name": "simple-validation",
   "version": "0.0.1",
-  "description": "Basic boilerplate",
+  "description": "Easy validators composing",
+  "keywords": [
+    "validate",
+    "validator",
+    "validation",
+    "compose",
+    "combine",
+    "scheme"
+  ],
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jeron-diovis/package-boilerplate"
+    "url": "https://github.com/jeron-diovis/simple-validator"
   },
   "files": [
     "dist",
@@ -18,10 +26,11 @@
     "lint:watch": "npm run lint -- -w",
     "start": "parallelshell 'npm run test:watch' 'npm run lint:watch'",
     "clean": "rm -rf dist lib",
-    "build": "npm run build:transpile && npm run build:bundle",
-    "build:bundle": "webpack",
+    "build": "npm run build:transpile && npm run build:bundle && npm run measure",
+    "build:bundle": "parallel-webpack --stats=0",
     "build:transpile": "babel src -d lib",
-    "prebuild": "npm run lint && npm test && npm run clean"
+    "prebuild": "npm run lint && npm test && npm run clean",
+    "measure": "gzip -9 -k dist/* && pkgfiles --sort=name -f dist && rm dist/*.gz"
   },
   "author": "Jeron Diovis <void.jeron.diovis@gmail.com>",
   "license": "MIT",
@@ -41,7 +50,9 @@
     "lodash.difference": "^4.5.0",
     "mocha": "^3.1.0",
     "mock-promises": "^0.8.2",
+    "parallel-webpack": "^1.6.1",
     "parallelshell": "^2.0.0",
+    "pkgfiles": "^2.3.2",
     "sinon": "^1.17.6",
     "sinon-as-promised": "^4.0.2",
     "webpack": "^1.13.2",
@@ -49,6 +60,7 @@
     "webpack-info-plugin": "^0.1.0"
   },
   "dependencies": {
+    "babel-runtime": "^6.23.0",
     "lodash.curry": "^4.1.1",
     "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0",

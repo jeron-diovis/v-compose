@@ -1,69 +1,88 @@
 var sysPath = require("path")
 var root = __dirname
 var srcRoot = sysPath.join(root, "src")
+var fs = require("fs")
 
 var webpack = require("webpack")
-var WebpackInfoPlugin = require("webpack-info-plugin")
 var WebpackErrorNotificationPlugin = require("webpack-error-notification")
 
-var isProd = process.env.NODE_ENV === "production"
+var createVariants = require("parallel-webpack").createVariants;
 
-module.exports = {
-  context: srcRoot,
-
-  entry: "index.js",
-
-  output: {
-    path: sysPath.join(root, "dist"),
-    filename: "index.js",
-    library: "MyPackage",
-    libraryTarget: "umd",
+module.exports = createVariants(
+  {
+    minified: [ true, false ],
   },
 
-  resolve: {
-    root: srcRoot,
-  },
+  options => ({
+    context: srcRoot,
 
-  eslint: {
-    failOnError: true,
-    failOnWarning: true,
-  },
+    entry: "index.js",
 
-  module: {
-    preLoaders: [
-      {
-        test: /\.js$/i,
-        include: srcRoot,
-        loader: "eslint",
-      }
-    ],
+    output: {
+      path: sysPath.join(root, "dist"),
+      filename: "simple-validation" + (options.minified ? ".min" : "") + ".js",
+      library: "SimpleValidation",
+      libraryTarget: "umd",
+    },
 
-    loaders: [
-      {
-        test: /\.js$/i,
-        include: srcRoot,
-        loader: "babel",
-      }
-    ]
-  },
+    resolve: {
+      root: srcRoot,
+    },
 
-  plugins: [
-    new webpack.DefinePlugin({
-      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
-    }),
-  ].concat(
-    !isProd ? [
-      new WebpackErrorNotificationPlugin(),
-    ] : [
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.OccurrenceOrderPlugin(true),
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false
+    eslint: {
+      failOnError: true,
+      failOnWarning: true,
+    },
+
+    externals: (
+      Object.keys(
+        JSON.parse(
+          fs.readFileSync("package.json")
+        ).dependencies
+      ).concat([
+        /^lodash($|(\/|\.).+)/,
+        /^babel-runtime($|\/.+)/,
+      ])
+    ),
+
+    module: {
+      preLoaders: [
+        {
+          test: /\.js$/i,
+          include: srcRoot,
+          loader: "eslint",
         }
-      }),
-    ]
-  ),
+      ],
 
-  devtool: isProd ? false : "#inline-source-map",
-}
+      loaders: [
+        {
+          test: /\.js$/i,
+          include: srcRoot,
+          loader: "babel",
+        }
+      ]
+    },
+
+    plugins: [
+      new webpack.DefinePlugin({
+        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+      }),
+    ].concat(
+      !options.minified
+        ? [
+          new WebpackErrorNotificationPlugin(),
+        ]
+        : [
+          new webpack.optimize.DedupePlugin(),
+          new webpack.optimize.OccurrenceOrderPlugin(true),
+          new webpack.optimize.UglifyJsPlugin({
+            compress: {
+              warnings: false
+            }
+          }),
+        ]
+    ),
+
+    devtool: false,
+  })
+)

@@ -4,7 +4,6 @@
     "closure-elimination",
     "transform-async-to-generator",
     ["transform-runtime", {
-      "helpers": false,
       "polyfill": false,
       "regenerator": true
     }]
