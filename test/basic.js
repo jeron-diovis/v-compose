@@ -227,6 +227,28 @@ describe("basics:", () => {
     })
   })
 
+  describe("should allow object with named keys as validator config", () => {
+    it("sync", () => {
+      const validator = x => x > 0 ? null : "error"
+      const validate = APP.validate({ validator })
+
+      assert.equal(
+        validate(-1),
+        "error"
+      )
+    })
+
+    it("async", async () => {
+      const validator = x => x > 0 ? null : "error"
+      const validate = APP.validate.async({ validator })
+
+      assert.equal(
+        await validate(-1),
+        "error"
+      )
+    })
+  })
+
   it("composition", () => {
     const V1 = APP.validate([
       [ x => x > 0, "not positive" ]

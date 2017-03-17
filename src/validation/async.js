@@ -24,7 +24,7 @@ const validateValue = F.curry(
 export const getFirstError = F.curry(async (validators, value, ...args) => {
   let result = ERR_NONE
 
-  for (const validator of validators) {
+  for (const validator of F.values(validators)) {
     result = await validateValue(validator, value, ...args)
     if (isError(result)) {
       return result
@@ -36,7 +36,7 @@ export const getFirstError = F.curry(async (validators, value, ...args) => {
 
 export const getAllErrors = F.curry(async (validators, value, ...args) => (
   (await Promise.all(
-    validators.map(cfg => validateValue(cfg, value, ...args))
+    F.values(validators).map(cfg => validateValue(cfg, value, ...args))
   ))
   .filter(isError)
 ))
