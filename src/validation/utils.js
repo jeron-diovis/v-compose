@@ -3,7 +3,7 @@ import { ERR_NONE, ERR_VALID } from "../constants"
 
 const mapValidators = F.curry((fn, validators, transform) => {
   const newValidators = transform(validators)
-  const ret = (...args) => fn(newValidators, ...args)
+  const ret = fn.bind(null, newValidators)
   ret.map = mapValidators(fn, newValidators)
   return ret
 })
