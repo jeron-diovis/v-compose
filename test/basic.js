@@ -247,25 +247,61 @@ describe("basics:", () => {
     })
   })
 
-  describe("should allow object with named keys instead of validators list", () => {
-    it("sync", () => {
-      const validator = x => x > 0 ? null : "error"
-      const validate = APP.validate({ validator })
+  describe("named validators", () => {
+    describe("should allow object instead of array as validators list", () => {
+      it("sync", () => {
+        const validator = x => x > 0 ? null : "error"
+        const validate = APP.validate({ validator })
 
-      assert.equal(
-        validate(-1),
-        "error"
-      )
+        assert.equal(
+          validate(-1),
+          "error"
+        )
+      })
+
+      it("async", async () => {
+        const validator = x => x > 0 ? null : "error"
+        const validate = APP.validate.async({ validator })
+
+        assert.equal(
+          await validate(-1),
+          "error"
+        )
+      })
     })
 
-    it("async", async () => {
-      const validator = x => x > 0 ? null : "error"
-      const validate = APP.validate.async({ validator })
+    describe("`validateAll` should return object with keys of failed validators", () => {
+      it("sync", () => {
+        const validate = APP.validateAll({
+          number: [ x => typeof x === "number", "not number" ],
+          positive: [ x => x > 0, "not positive" ],
+          even: [ x => x % 2 === 0, "not even" ],
+        })
 
-      assert.equal(
-        await validate(-1),
-        "error"
-      )
+        assert.deepEqual(
+          validate(-1),
+          {
+            positive: "not positive",
+            even: "not even",
+          }
+        )
+      })
+
+      it("async", async () => {
+        const validate = APP.validateAll.async({
+          number: [ x => typeof x === "number", "not number" ],
+          positive: [ x => x > 0, "not positive" ],
+          even: [ x => x % 2 === 0, "not even" ],
+        })
+
+        assert.deepEqual(
+          await validate(-1),
+          {
+            positive: "not positive",
+            even: "not even",
+          }
+        )
+      })
     })
   })
 

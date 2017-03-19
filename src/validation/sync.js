@@ -42,7 +42,13 @@ export const getFirstError = F.curry((validators, value, ...args) => {
 })
 
 export const getAllErrors = F.curry((validators, value, ...args) => (
-  F.values(validators).map(cfg => validateValue(cfg, value, ...args)).filter(isError)
+  F.filter(
+    isError,
+    F.map(
+      cfg => validateValue(cfg, value, ...args),
+      validators
+    )
+  )
 ))
 
 export const isValid = F.curry(
