@@ -221,7 +221,7 @@ const v1 = V.validateAll({
   even: [ x => x % 2 === 0, "not even" ],
 })
 
-v1(-1) // => [ "not positive", "not even" ]
+v1(-1) // => { positive: "not positive", even: "not even" }
 
 const v2 = v1
   .map(omit([ "even" ]))
@@ -233,5 +233,5 @@ const v2 = v1
     return origin(value, ...args)
   })))
   
-v2(-1) // => [ "-1 is not positive" ]
+v2(-1) // => { positive: "-1 is not positive" }
 ```
