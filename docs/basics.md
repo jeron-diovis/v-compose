@@ -10,7 +10,7 @@
 
 ---
 
-#### ValidatorsList :: Array.<ValidatorConfig> | Object.<String, ValidatorConfig>
+#### ValidatorsList :: Array.\<ValidatorConfig\> | Object.<String, ValidatorConfig>
 
 #### ValidatorConfig :: Array.<Predicate, ErrorMsg [, Params]> | { fn: Predicate, msg: ErrorMsg [, params: Params] } | CustomValidator
 
