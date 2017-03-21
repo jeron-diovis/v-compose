@@ -1,5 +1,5 @@
 {
-  "name": "simple-validation",
+  "name": "v-compose",
   "version": "1.0.0",
   "description": "Easy validators composing",
   "keywords": [
@@ -13,7 +13,7 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jeron-diovis/simple-validator"
+    "url": "https://github.com/jeron-diovis/v-compose"
   },
   "files": [
     "dist",

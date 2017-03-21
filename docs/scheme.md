@@ -13,7 +13,7 @@
 ## Example
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 const requiredValidator = [
   x => x != null, "this field is required"
@@ -57,11 +57,11 @@ V.scheme({
   ])
 })
 
-// [simple-validation :: scheme]
+// [v-compose :: scheme]
 // One of validators in your scheme seems to return a Promise. 
 // Use 'scheme.async' helper instead of 'scheme'.
 
-// Uncaught Error: [simple-validation :: scheme] Validators in sync scheme must not return a Promise
+// Uncaught Error: [v-compose :: scheme] Validators in sync scheme must not return a Promise
 ```
 
 ### Currying
@@ -73,7 +73,7 @@ Just like other helpers, `scheme` is [`curried`](/docs/basics.md#currying).
 Just like other helpers, partially applied `scheme` has [`.map`](/docs/basics.md#modifying-partially-applied-helpers) method.
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 import set from "lodash/fp/set"
 
@@ -96,7 +96,7 @@ validate.map(scheme => ({
 ### Validating subset of scheme fields
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 const fooValidator = V.validate(...)
 
@@ -120,5 +120,5 @@ validateJustFoo(...) // => just_error_message_for_foo_field
 
 // undefined fields
 validate.fields([ "foo", "bla" ]) 
-// => Uncaught Error: [simple-validation :: scheme.fields] Following keys are not defined in scheme: bla
+// => Uncaught Error: [v-compose :: scheme.fields] Following keys are not defined in scheme: bla
 ```

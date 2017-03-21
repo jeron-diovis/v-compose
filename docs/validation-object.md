@@ -13,7 +13,7 @@ Validation object uses config to create and group [all other helpers](/docs/basi
 ## Example 
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 
 const validation = V.validation([

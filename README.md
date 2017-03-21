@@ -1,4 +1,4 @@
-# simple-validation
+# v-compose
 
 > ### A set of helpers for combining validators
  
@@ -8,12 +8,12 @@ This lib only cares about **combining** validators. It does does not provide any
 
 ## install
 
-`npm i -S simple-validation`
+`npm i -S v-compose`
 
 ## Example
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 
 const validate = V.validate([

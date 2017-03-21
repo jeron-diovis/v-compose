@@ -29,7 +29,7 @@
 ## Example
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 
 const validate = V.validate([
@@ -66,7 +66,7 @@ isValid(3) // => false
 Each helper is curried (with arity of 2).
  
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 V.validate(cfg, value, ...args)
 
@@ -81,7 +81,7 @@ it is allowed to define `ValidatorsList` as object instead of array.
 In this case `validateAll` helper will also return an object with keys corresponding to failed validators:
  
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 const validate = V.validateAll({
   positive: [ x => x > 0, "not positive" ],
@@ -102,7 +102,7 @@ validate(2) // => {}
 This is done mostly for usage with 3-party libs like [this one](https://www.npmjs.com/package/validator). It would be nice to have a library of curried validators with params-first signatures, but so far I didn't found anything similar.  
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 const validate = V.validate([
   [
@@ -125,7 +125,7 @@ Validator is something that is supposed to return an error message.
 If value is valid, it should return an "absence of error". For this purpose there is an `ERR_VALID` constant:
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 const isValid = V.validate(cfg, value) === V.ERR_VALID
 ```
 
@@ -157,7 +157,7 @@ If each validator in validators list has returned `ERR_NONE`, the entire validat
 So, returning to example above:
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 const result = V.validate(cfg, value)
 const isValid = result === V.ERR_VALID || result === V.ERR_NONE
 ```
@@ -188,11 +188,11 @@ const validate = V.validate([
 
 validate(...)
 
-// [simple-validation]
+// [v-compose]
 // Your validator seems to return a Promise. 
 // Use 'validate.async' helper instead of 'validate'.
 //
-// Uncaught Error: [simple-validation] Validator must return only true, false, or ERR_NONE
+// Uncaught Error: [v-compose] Validator must return only true, false, or ERR_NONE
 ```
 
 ### Modifying partially applied helpers
@@ -208,7 +208,7 @@ So, instead, each partially applied helper provides a `.map` method. It accepts 
 With named validators it's especially convenient:
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 import omit from "lodash/fp/omit"
 import set from "lodash/fp/set"

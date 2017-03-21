@@ -20,7 +20,7 @@ module.exports = createVariants(
 
     output: {
       path: sysPath.join(root, "dist"),
-      filename: "simple-validation" + (options.minified ? ".min" : "") + ".js",
+      filename: "v-compose" + (options.minified ? ".min" : "") + ".js",
       library: "SimpleValidation",
       libraryTarget: "umd",
     },

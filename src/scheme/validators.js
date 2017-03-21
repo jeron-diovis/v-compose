@@ -5,12 +5,12 @@ import * as F from "../lib/func_utils"
 
 const processSyncSchemeValidatorResult = result => {
   if (result && typeof result.then === "function") {
-    console.warn(`[simple-validation :: scheme]
+    console.warn(`[v-compose :: scheme]
       One of validators in your scheme seems to return a Promise. 
       Use 'scheme.async' helper instead of 'scheme'.
     `)
 
-    throw new Error(`[simple-validation :: scheme]
+    throw new Error(`[v-compose :: scheme]
       Validators in sync scheme must not return a Promise 
     `)
   }

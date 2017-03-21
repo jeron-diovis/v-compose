@@ -43,7 +43,7 @@ export const createValidation = (validateFirst, validateAll, isValid) => validat
 })
 
 const DEFAULT_ERROR_MSG = `
-  [simple-validator] Undefined error message.
+  [v-compose] Undefined error message.
   Use explicit empty string, if you want to not display any text. 
 `
 
@@ -68,13 +68,13 @@ export const processValidatorResult = (result, msg, ...args) => {
 
     default:
       if (result && typeof result.then === "function") {
-        console.warn(`[simple-validation]
+        console.warn(`[v-compose]
           Your validator seems to return a Promise. 
           Use 'validate.async' helper instead of 'validate'.
         `)
       }
 
-      throw new Error(`[simple-validation]
+      throw new Error(`[v-compose]
         Validator must return only true, false, or ERR_NONE
       `)
   }

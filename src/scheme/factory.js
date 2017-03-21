@@ -5,7 +5,7 @@ import * as F from "../lib/func_utils"
 
 const forSingleField = scheme => function(prop, ...args) {
   if (!scheme.hasOwnProperty(prop)) {
-    throw new Error(`[simple-validation :: scheme.just]
+    throw new Error(`[v-compose :: scheme.just]
       Key '${prop}' is not defined is scheme
     `)
   }
@@ -20,12 +20,12 @@ const forSingleField = scheme => function(prop, ...args) {
 
 const forFieldsList = (validateScheme, scheme, omitMode = false) => function(props, ...args) {
   if (!Array.isArray(props)) {
-    throw new Error("[simple-validation :: scheme.fields] 'props' must be an Array")
+    throw new Error("[v-compose :: scheme.fields] 'props' must be an Array")
   }
 
   const unexistingKeys = F.difference(props, Object.keys(scheme))
   if (unexistingKeys.length > 0) {
-    throw new Error(`[simple-validation :: scheme.fields]
+    throw new Error(`[v-compose :: scheme.fields]
       Following keys are not defined in scheme:
       ${unexistingKeys.join(", ")}
     `)

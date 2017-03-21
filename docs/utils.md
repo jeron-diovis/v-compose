@@ -9,7 +9,7 @@
 ## Example
 
 ```js
-import * as V from "simple-validation"
+import * as V from "v-compose"
 
 V.isError("the_message") // => true
 V.isError(V.ERR_VALID) // => false
