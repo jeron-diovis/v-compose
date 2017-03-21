@@ -4,7 +4,7 @@
  
 Inspired by [this article](https://medium.com/javascript-inside/form-validation-as-a-higher-order-component-pt-1-83ac8fd6c1f0).
 
-This lib only cares about **combining** validators. It does does not provide any ready-to-use validator functions like `isEmail`, `isRequired`, etc. For these purposes you may use other libs, like [this one](https://www.npmjs.com/package/validator).  
+This lib only cares about **combining** validators. It does not provide any ready-to-use validator functions like `isEmail`, `isRequired`, etc. For these purposes you may use other libs, like [this one](https://www.npmjs.com/package/validator).  
 
 ## install
 
