@@ -9,6 +9,10 @@ isError.not = x => !isError(x)
 // ---
 
 export const hasErrors = obj => {
+  if (obj == null) {
+    return false
+  }
+
   for (const k of Object.keys(obj)) {
     const v = obj[k]
 
