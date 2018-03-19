@@ -1,4 +1,5 @@
 import validation, * as APP from "../src"
+import { ERR_NONE } from "../src/constants"
 
 describe("basics:", () => {
   it("api", () => {
@@ -7,6 +8,9 @@ describe("basics:", () => {
 
     assert.isFunction(APP.hasErrors, "hasErrors")
     assert.isFunction(APP.hasErrors.not, "hasErrors.not")
+
+    assert.isFunction(APP.getErrorValue, "APP.getErrorValue")
+    assert.isFunction(APP.getValidityStatus, "getValidityStatus")
 
     assert.property(APP, "ERR_NONE")
     assert.isUndefined(APP.ERR_NONE)
@@ -56,6 +60,150 @@ describe("basics:", () => {
     assert.isFalse(APP.hasErrors.not({
       x: [ APP.ERR_NONE, "whatever" ],
     }), "invert scheme with array")
+  })
+
+  describe("APP.getErrorValue:", () => {
+    it("raw", () => {
+      assert.equal(APP.getErrorValue("some error msg"), "some error msg", "error text")
+      assert.equal(APP.getErrorValue(APP.ERR_VALID), APP.ERR_VALID, "valid")
+      assert.equal(APP.getErrorValue(APP.ERR_NONE), APP.ERR_NONE, "none")
+    })
+
+    describe("collections:", () => {
+      describe("array:", () => {
+        it("should return first found error value", () => {
+          assert.equal(
+            APP.getErrorValue([
+              APP.ERR_NONE,
+              APP.ERR_VALID,
+              "some error msg",
+              "some another error msg",
+            ]),
+            "some error msg",
+          )
+        })
+
+        it("should return first found 'valid' value if there are no errors", () => {
+          assert.equal(
+            APP.getErrorValue([
+              APP.ERR_NONE,
+              APP.ERR_VALID,
+            ]),
+            APP.ERR_VALID,
+          )
+        })
+
+        it("should return ERR_NONE, if there are no errors and no 'valid' values", () => {
+          assert.equal(
+            APP.getErrorValue([]),
+            APP.ERR_NONE,
+          )
+        })
+      })
+
+      describe("object:", () => {
+        it("should return first found error value", () => {
+          assert.equal(
+            APP.getErrorValue({
+              a: APP.ERR_NONE,
+              b: APP.ERR_VALID,
+              c: "some error msg",
+              d: "some another error msg",
+            }),
+            "some error msg",
+          )
+        })
+
+        it("should return first found 'valid' value if there are no errors", () => {
+          assert.equal(
+            APP.getErrorValue({
+              a: APP.ERR_NONE,
+              b: APP.ERR_VALID,
+            }),
+            APP.ERR_VALID,
+          )
+        })
+
+        it("should return ERR_NONE, if there are no errors and no 'valid' values", () => {
+          assert.equal(
+            APP.getErrorValue({}),
+            APP.ERR_NONE,
+          )
+        })
+      })
+    })
+  })
+
+  describe("getValidityStatus:", () => {
+    it("raw", () => {
+      assert.equal(APP.getValidityStatus("some error msg"), false, "error text")
+      assert.equal(APP.getValidityStatus(APP.ERR_VALID), true, "valid")
+      assert.equal(APP.getValidityStatus(APP.ERR_NONE), undefined, "none")
+    })
+
+    describe("collections:", () => {
+      describe("array:", () => {
+        it("should return 'false' if there are errors", () => {
+          assert.equal(
+            APP.getValidityStatus([
+              APP.ERR_NONE,
+              APP.ERR_VALID,
+              "some error msg",
+              "some another error msg",
+            ]),
+            false,
+          )
+        })
+
+        it("should return 'true' if there are 'valid' values and no errors", () => {
+          assert.equal(
+            APP.getValidityStatus([
+              APP.ERR_NONE,
+              APP.ERR_VALID,
+            ]),
+            true,
+          )
+        })
+
+        it("should return 'undefined', if there are no errors and no 'valid' values", () => {
+          assert.equal(
+            APP.getValidityStatus([]),
+            undefined,
+          )
+        })
+      })
+
+      describe("object:", () => {
+        it("should return 'false' if there are errors", () => {
+          assert.equal(
+            APP.getValidityStatus({
+              a: APP.ERR_NONE,
+              b: APP.ERR_VALID,
+              c: "some error msg",
+              d: "some another error msg",
+            }),
+            false,
+          )
+        })
+
+        it("should return 'true' if there are 'valid' values and no errors", () => {
+          assert.equal(
+            APP.getValidityStatus({
+              a: APP.ERR_NONE,
+              b: APP.ERR_VALID,
+            }),
+            true,
+          )
+        })
+
+        it("should return 'undefined', if there are no errors and no 'valid' values", () => {
+          assert.equal(
+            APP.getValidityStatus({}),
+            APP.ERR_NONE,
+          )
+        })
+      })
+    })
   })
 
   describe("validator arguments", () => {
