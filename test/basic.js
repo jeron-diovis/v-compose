@@ -393,6 +393,28 @@ describe("basics:", () => {
         "error"
       )
     })
+
+    describe("and should still work after mapping", () => {
+      it("sync", () => {
+        const validator = x => x > 0 ? null : "error"
+        const validate = APP.validate([ validator ]).map(x => x)
+
+        assert.equal(
+          validate(-1),
+          "error"
+        )
+      })
+
+      it("async", async () => {
+        const validator = x => x > 0 ? null : "error"
+        const validate = APP.validate.async([ validator ]).map(x => x)
+
+        assert.equal(
+          await validate(-1),
+          "error"
+        )
+      })
+    })
   })
 
   describe("named validators", () => {

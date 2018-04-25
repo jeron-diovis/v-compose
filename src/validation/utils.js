@@ -1,10 +1,12 @@
 import * as F from "../lib/func_utils"
 import { ERR_NONE, ERR_VALID } from "../constants"
+import Symbol from "es6-symbol"
 
+export const SymbolRawFunc = Symbol("@@v-compose/cfg-raw-func")
 
 const ensureObjectValidators = F.map(x => {
-  if (typeof x === "function") {
-    return { fn: x, msg: undefined, params: undefined }
+  if (typeof x === "function" || x[SymbolRawFunc] === true) {
+    return { fn: x, msg: undefined, params: undefined, [SymbolRawFunc]: true }
   }
 
   if (Array.isArray(x)) {

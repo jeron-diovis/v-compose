@@ -1,14 +1,15 @@
 import * as F from "../lib/func_utils"
 import { isError } from "../helpers"
 import { ERR_NONE } from "../constants"
-import { processValidatorResult } from "./utils"
+import { processValidatorResult, SymbolRawFunc } from "./utils"
 
 // ---
 
 const validateValue = F.curry(
   async (cfg, value, ...args) => {
-    if (typeof cfg === "function") {
-      const result = await cfg(value, ...args)
+    if (typeof cfg === "function" || cfg[SymbolRawFunc] === true) {
+      const fn = typeof cfg === "function" ? cfg : cfg.fn
+      const result = await fn(value, ...args)
       const isValid = !isError(result)
       return processValidatorResult(isValid, result, value, ...args)
     }
