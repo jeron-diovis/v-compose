@@ -1,13 +1,30 @@
-import mapValues from "lodash.mapvalues"
-import pickBy from "lodash.pickby"
-import curry from "lodash.curry"
+export const curry = (fn, arity = fn.length) => function curried(...args) {
+  return args.length >= arity ? fn(...args) : (...nextArgs) => curried(...args, ...nextArgs)
+}
 
-export { curry }
-export { default as zipObject } from "lodash.zipobject"
-export { default as entries } from "lodash.topairs"
-export { default as pick } from "lodash.pick"
-export { default as omit } from "lodash.omit"
-export { default as difference } from "lodash.difference"
+function mapValues(obj, fn) {
+  return Object.entries(obj).reduce((m, [ k, v ]) => {
+    m[k] = fn(v, k)
+    return m
+  }, {})
+}
+
+function pickBy(obj, fn) {
+  return Object.entries(obj).reduce((m, [ k, v ]) => {
+    if (fn(v, k)) {
+      m[k] = v
+    }
+    return m
+  }, {})
+}
+
+export function pick(obj, props) {
+  return pickBy(obj, (_, k) => props.includes(k))
+}
+
+export function omit(obj, props) {
+  return pickBy(obj, (_, k) => !props.includes(k))
+}
 
 export const values = x => {
   if (x == null) {
@@ -26,3 +43,14 @@ export const map = curry((fn, x) =>
 
 export const filter = curry((fn, x) =>
   Array.isArray(x) ? x.filter(fn) : pickBy(x, fn))
+
+export function difference(xs1, xs2) {
+  return xs1.filter(x => !xs2.includes(x))
+}
+
+export function zipObject(keys, values) {
+  return keys.reduce((m, k, i) => {
+    m[k] = values[i]
+    return m
+  }, {})
+}

@@ -48,7 +48,7 @@ export const getAllErrors = F.curry(async (validators, value, ...args) => {
     validators
   )
 
-  for (const [ k, v ] of F.entries(result)) {
+  for (const [ k, v ] of Object.entries(result)) {
     result[k] = await v
   }
 
